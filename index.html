@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>ジャストタップ ホラー(プロトタイプ)</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="game">
+  <!-- タイトル画面用背景映像 -->
+  <video id="bgTitle" src="assets/bg_title_door_01.mp4" muted loop playsinline></video>
+
+  <!-- ゲーム中の背景映像(ステージはランダムで切り替え) -->
+  <video id="bg" muted loop playsinline></video>
+
+  <!-- タップ対象(正解) -->
+  <video id="targetCorrect" class="target" src="assets/target_correct_cross_light.mp4" muted playsinline></video>
+
+  <!-- タップ対象(ハズレ) -->
+  <video id="targetWrong" class="target" src="assets/target_wrong_handprint.mp4" muted playsinline></video>
+
+  <!-- 判定リング -->
+  <video id="ring" class="ring" src="assets/ui_ring_frame.mp4" muted loop playsinline></video>
+
+  <!-- 成功エフェクト -->
+  <video id="effect" class="effect" src="assets/effect_success_burst.mp4" muted playsinline></video>
+
+  <!-- UIオーバーレイ(スコア・コンボなど) -->
+  <canvas id="ui"></canvas>
+
+  <!-- ローディング画面 -->
+  <div id="loadingScreen">
+    <p class="loading-label">NOW LOADING</p>
+    <div class="loading-bar-outer">
+      <div class="loading-bar-inner" id="loadingBarInner"></div>
+    </div>
+    <p class="loading-count" id="loadingCount">0 / 0</p>
+  </div>
+
+  <!-- スタート画面 -->
+  <div id="startScreen" class="hidden">
+    <h1>ジャストタップ ホラー</h1>
+    <div class="rules">
+      <p><span class="rule-icon rule-good"></span>青く光る印が出たら、すぐタップ</p>
+      <p><span class="rule-icon rule-bad"></span>赤黒い手形が出たら、絶対にタップしない</p>
+      <p><span class="rule-icon rule-neutral"></span>取り逃してもミス扱いになる</p>
+      <p><span class="rule-icon rule-neutral"></span>ミスが3回続くとゲームオーバー</p>
+      <p><span class="rule-icon rule-neutral"></span>コンボが伸びるほど、場の緊張感が増していく</p>
+      <p><span class="rule-icon rule-neutral"></span>舞台はプレイのたびにランダムで変わる</p>
+    </div>
+    <button id="startBtn">スタート</button>
+    <p class="credit">画像生成: Nano Banana / 動画生成: Gemini Omni / BGM: Google Flow Music</p>
+  </div>
+
+  <!-- ゲームオーバー画面 -->
+  <div id="endScreen" class="hidden">
+    <h1>終了</h1>
+    <p id="finalScore"></p>
+    <button id="retryBtn">もう一度</button>
+  </div>
+</div>
+
+<!-- BGM -->
+<audio id="bgmMain" src="assets/bgm_main_loop.mp3" loop></audio>
+<audio id="bgmTension" src="assets/bgm_tension_rise.mp3" loop></audio>
+
+<script src="game.js"></script>
+</body>
+</html>
