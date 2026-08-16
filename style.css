@@ -211,7 +211,7 @@ html, body {
   overflow: hidden;
 }
 
-#jumpscareVideo, #jumpscareSilhouette {
+#jumpscareVideo {
   position: absolute;
   inset: 0;
   width: 100%;
@@ -220,12 +220,8 @@ html, body {
   opacity: 0;
 }
 
-#jumpscareVideo.active, #jumpscareSilhouette.active {
+#jumpscareVideo.active {
   opacity: 1;
-}
-
-#jumpscareSilhouette {
-  transition: opacity 0.1s ease;
 }
 
 button {

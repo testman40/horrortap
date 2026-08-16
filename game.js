@@ -24,7 +24,6 @@ const retryBtn = document.getElementById('retryBtn');
 const finalScoreEl = document.getElementById('finalScore');
 const jumpscare = document.getElementById('jumpscare');
 const jumpscareVideo = document.getElementById('jumpscareVideo');
-const jumpscareSilhouette = document.getElementById('jumpscareSilhouette');
 
 // ---- 効果音(Web Audio APIで合成。音声ファイルは使わない) ----
 let audioCtx = null;
@@ -130,8 +129,7 @@ const ASSET_LIST = [
   'assets/effect_success_burst.mp4',
   'assets/bgm_main_loop.mp3',
   'assets/bgm_tension_rise.mp3',
-  'assets/ending_woman_approach.mp4',
-  'assets/ending_woman_turn_silhouette.png',
+  'assets/whitehand.mp4',
   ...STAGES,
 ];
 
@@ -345,7 +343,7 @@ function endGame() {
   playJumpscareSequence();
 }
 
-// ゲームオーバー演出:接近ショット(コマ送り再生)→ シルエットで一瞬止める → 暗転 → 結果画面
+// ゲームオーバー演出:女性が後ろ姿で近づいてくる映像をコマ送り再生 → 暗転 → 結果画面
 const JUMPSCARE_FRAME_STEP = 0.6;     // 1コマで進める秒数(大きいほどワープ感が強い)
 const JUMPSCARE_STEP_INTERVAL = 220;  // コマ送りの間隔(ミリ秒。小さいほど速く進む)
 
@@ -363,7 +361,7 @@ function playJumpscareSequence() {
     clearInterval(stepTimer);
     clearTimeout(fallbackTimer);
     jumpscareVideo.removeEventListener('loadedmetadata', startStepping);
-    showSilhouetteStep();
+    finishJumpscare();
   };
 
   // 動画が読み込めない等のトラブルに備え、最大4秒で強制的に先へ進む保険
@@ -403,18 +401,16 @@ function playJumpscareSequence() {
   }
 }
 
-function showSilhouetteStep() {
-  jumpscareVideo.classList.remove('active');
-  jumpscareVideo.pause();
-
-  jumpscareSilhouette.classList.add('active');
+function finishJumpscare() {
+  // コマ送りの最後の瞬間に、低い不協和音を鳴らして緊張を最大化する
   playJumpscareSting();
 
-  // シルエットを一瞬見せてから暗転し、結果画面へ
+  // 少し静止させてから暗転し、結果画面へ
   setTimeout(() => {
-    jumpscareSilhouette.classList.remove('active');
+    jumpscareVideo.classList.remove('active');
+    jumpscareVideo.pause();
     setTimeout(showResult, 400);
-  }, 700);
+  }, 500);
 }
 
 function showResult() {
