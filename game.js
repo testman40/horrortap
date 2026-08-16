@@ -22,6 +22,9 @@ const endScreen = document.getElementById('endScreen');
 const startBtn = document.getElementById('startBtn');
 const retryBtn = document.getElementById('retryBtn');
 const finalScoreEl = document.getElementById('finalScore');
+const jumpscare = document.getElementById('jumpscare');
+const jumpscareVideo = document.getElementById('jumpscareVideo');
+const jumpscareSilhouette = document.getElementById('jumpscareSilhouette');
 
 // ---- 効果音(Web Audio APIで合成。音声ファイルは使わない) ----
 let audioCtx = null;
@@ -51,10 +54,32 @@ function playTone(type, freq, duration, volume, delay = 0) {
   osc.stop(audioCtx.currentTime + delay + duration);
 }
 
-// タップ成功音:明るい二音上昇(ピンッ)
-function playSuccessSE() {
-  playTone('sine', 880, 0.12, 0.25, 0);
-  playTone('sine', 1320, 0.15, 0.2, 0.06);
+// タップ成功音:コンボ数に応じてピッチが少しずつ上がる(明るい二音上昇)
+function playSuccessSE(comboCount) {
+  const tier = Math.floor((comboCount - 1) / 5); // 5コンボごとに音程が一段上がる
+  const base = 880 * Math.pow(1.12, tier);
+  playTone('sine', base, 0.12, 0.25, 0);
+  playTone('sine', base * 1.5, 0.15, 0.2, 0.06);
+
+  // 5コンボ達成ごとに、通常音に重ねて特別なジングルを鳴らす
+  if (comboCount > 0 && comboCount % 5 === 0) {
+    playComboMilestoneSE(tier);
+  }
+}
+
+// コンボ5の倍数到達時のジングル:短い上昇アルペジオ
+function playComboMilestoneSE(tier) {
+  const root = 660 * Math.pow(1.15, tier);
+  playTone('triangle', root, 0.1, 0.22, 0.08);
+  playTone('triangle', root * 1.25, 0.1, 0.22, 0.17);
+  playTone('triangle', root * 1.5, 0.18, 0.25, 0.26);
+}
+
+// ゲームオーバー演出:シルエット出現の瞬間に鳴らす低い不協和音
+function playJumpscareSting() {
+  playTone('sawtooth', 55, 0.9, 0.3, 0);
+  playTone('sawtooth', 58, 0.9, 0.25, 0);
+  playTone('square', 830, 0.15, 0.15, 0);
 }
 
 // タップ失敗音:低く濁った下降音(ブブッ)
@@ -105,6 +130,8 @@ const ASSET_LIST = [
   'assets/effect_success_burst.mp4',
   'assets/bgm_main_loop.mp3',
   'assets/bgm_tension_rise.mp3',
+  'assets/ending_woman_approach.mp4',
+  'assets/ending_woman_turn_silhouette.png',
   ...STAGES,
 ];
 
@@ -220,7 +247,7 @@ function onHitCorrect() {
   score += 1;
   combo += 1;
   playEffect();
-  playSuccessSE();
+  playSuccessSE(combo);
 
   // コンボが伸びたらBGMを緊張モードへ切り替え
   if (combo === 5) {
@@ -315,6 +342,83 @@ function endGame() {
   hideTarget(targetWrong);
   bgmMain.pause();
   bgmTension.pause();
+  playJumpscareSequence();
+}
+
+// ゲームオーバー演出:接近ショット(コマ送り再生)→ シルエットで一瞬止める → 暗転 → 結果画面
+const JUMPSCARE_FRAME_STEP = 0.6;     // 1コマで進める秒数(大きいほどワープ感が強い)
+const JUMPSCARE_STEP_INTERVAL = 220;  // コマ送りの間隔(ミリ秒。小さいほど速く進む)
+
+function playJumpscareSequence() {
+  jumpscare.classList.remove('hidden');
+  jumpscareVideo.pause();
+  jumpscareVideo.classList.add('active');
+
+  let finished = false;
+  let stepTimer = null;
+
+  const finish = () => {
+    if (finished) return;
+    finished = true;
+    clearInterval(stepTimer);
+    clearTimeout(fallbackTimer);
+    jumpscareVideo.removeEventListener('loadedmetadata', startStepping);
+    showSilhouetteStep();
+  };
+
+  // 動画が読み込めない等のトラブルに備え、最大4秒で強制的に先へ進む保険
+  const fallbackTimer = setTimeout(finish, 4000);
+
+  function startStepping() {
+    const duration = jumpscareVideo.duration && isFinite(jumpscareVideo.duration)
+      ? jumpscareVideo.duration
+      : 4;
+    let pos = 0;
+
+    try {
+      jumpscareVideo.currentTime = 0;
+    } catch (e) {
+      // 読み込み状況によっては失敗することがあるが無視して進める
+    }
+
+    stepTimer = setInterval(() => {
+      pos += JUMPSCARE_FRAME_STEP;
+      if (pos >= duration) {
+        finish();
+        return;
+      }
+      try {
+        jumpscareVideo.currentTime = pos;
+      } catch (e) {
+        // シークに失敗しても次のコマ送りは継続する
+      }
+    }, JUMPSCARE_STEP_INTERVAL);
+  }
+
+  if (jumpscareVideo.readyState >= 1) {
+    // すでに尺情報(メタデータ)が読み込み済みならすぐ開始
+    startStepping();
+  } else {
+    jumpscareVideo.addEventListener('loadedmetadata', startStepping, { once: true });
+  }
+}
+
+function showSilhouetteStep() {
+  jumpscareVideo.classList.remove('active');
+  jumpscareVideo.pause();
+
+  jumpscareSilhouette.classList.add('active');
+  playJumpscareSting();
+
+  // シルエットを一瞬見せてから暗転し、結果画面へ
+  setTimeout(() => {
+    jumpscareSilhouette.classList.remove('active');
+    setTimeout(showResult, 400);
+  }, 700);
+}
+
+function showResult() {
+  jumpscare.classList.add('hidden');
   finalScoreEl.textContent = `スコア: ${score}`;
   endScreen.classList.remove('hidden');
 
