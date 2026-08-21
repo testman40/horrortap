@@ -441,3 +441,7 @@ bgTitle.classList.add('active');
 
 // 素材の事前読み込みを開始
 preloadAssets();
+
+// ---------- 素材の簡易的な持ち出し防止(右クリック保存・ドラッグ保存の抑止) ----------
+document.addEventListener('contextmenu', (e) => e.preventDefault());
+document.addEventListener('dragstart', (e) => e.preventDefault());

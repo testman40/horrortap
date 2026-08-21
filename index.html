@@ -10,29 +10,29 @@
 
 <div id="game">
   <!-- タイトル画面用背景映像 -->
-  <video id="bgTitle" src="assets/bg_title_door_01.mp4" muted loop playsinline></video>
+  <video id="bgTitle" src="assets/bg_title_door_01.mp4" muted loop playsinline controlsList="nodownload noremoteplayback" disablePictureInPicture oncontextmenu="return false"></video>
 
   <!-- ゲーム中の背景映像(ステージはランダムで切り替え) -->
-  <video id="bg" muted loop playsinline></video>
+  <video id="bg" muted loop playsinline controlsList="nodownload noremoteplayback" disablePictureInPicture oncontextmenu="return false"></video>
 
   <!-- タップ対象(正解) -->
-  <video id="targetCorrect" class="target" src="assets/target_correct_cross_light.mp4" muted playsinline></video>
+  <video id="targetCorrect" class="target" src="assets/target_correct_cross_light.mp4" muted playsinline controlsList="nodownload noremoteplayback" disablePictureInPicture oncontextmenu="return false"></video>
 
   <!-- タップ対象(ハズレ) -->
-  <video id="targetWrong" class="target" src="assets/target_wrong_handprint.mp4" muted playsinline></video>
+  <video id="targetWrong" class="target" src="assets/target_wrong_handprint.mp4" muted playsinline controlsList="nodownload noremoteplayback" disablePictureInPicture oncontextmenu="return false"></video>
 
   <!-- 判定リング -->
-  <video id="ring" class="ring" src="assets/ui_ring_frame.mp4" muted loop playsinline></video>
+  <video id="ring" class="ring" src="assets/ui_ring_frame.mp4" muted loop playsinline controlsList="nodownload noremoteplayback" disablePictureInPicture oncontextmenu="return false"></video>
 
   <!-- 成功エフェクト -->
-  <video id="effect" class="effect" src="assets/effect_success_burst.mp4" muted playsinline></video>
+  <video id="effect" class="effect" src="assets/effect_success_burst.mp4" muted playsinline controlsList="nodownload noremoteplayback" disablePictureInPicture oncontextmenu="return false"></video>
 
   <!-- UIオーバーレイ(スコア・コンボなど) -->
   <canvas id="ui"></canvas>
 
   <!-- ゲームオーバー演出(女性が後ろ姿で接近してくるコマ送り演出→暗転) -->
   <div id="jumpscare" class="hidden">
-    <video id="jumpscareVideo" src="assets/whitehand.mp4" muted playsinline></video>
+    <video id="jumpscareVideo" src="assets/whitehand.mp4" muted playsinline controlsList="nodownload noremoteplayback" disablePictureInPicture oncontextmenu="return false"></video>
   </div>
 
   <!-- ローディング画面 -->
